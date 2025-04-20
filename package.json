@@ -1,0 +1,33 @@
+{
+  "name": "anki-mcp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && shx chmod +x dist/*.js",
+    "prepare": "npm run build",
+    "watch": "tsc --watch"
+  },
+  "bin": {
+  "mcp-server-anki": "./dist/index.js"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xabierjj/anki-mcp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xabierjj/anki-mcp/issues"
+  },
+  "homepage": "https://github.com/xabierjj/anki-mcp#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.1",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1"
+  }
+}

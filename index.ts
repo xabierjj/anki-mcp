@@ -8,11 +8,23 @@ import {
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import fetch from "node-fetch";
+import { readFile } from "fs/promises";
+import path from "path";
+import os from "os";
+import { mkdir } from "fs/promises";
 
 interface AnkiResponse {
   result: number | null;
   error: string | null;
 }
+
+
+const mediaFolder = path.join(os.homedir(), "anki-media");
+
+async function ensureMediaFolderExists() {
+  await mkdir(mediaFolder, { recursive: true });
+}
+
 
 const ADD_NOTE_TOOL: Tool = {
   name: "anki_add_note",
@@ -62,6 +74,18 @@ const CREATE_DECK_TOOL: Tool = {
     required: ["deckName"],
   },
 };
+
+const UPLOAD_IMAGE_TOOL: Tool = {
+    name: "anki_upload_image",
+    description: "Upload an image to Anki",
+    inputSchema: {
+      type: "object",
+      properties: {
+        fileName: { type: "string", description: "The filename of the image" },
+      },
+      required: ["fileName"],
+    },
+  };
 
 async function createDeck(deckName: string) {
   const response = await fetch("http://127.0.0.1:8765", {
@@ -196,6 +220,54 @@ async function addNote(deckName: string, front: string, back: string) {
   };
 }
 
+async function uploadImageFromFolder(fileName: string) {
+    const filePath = path.join(mediaFolder, fileName);
+    try {
+      const buffer = await readFile(filePath);
+      const base64data = buffer.toString("base64");
+  
+      const response = await fetch("http://127.0.0.1:8765", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "storeMediaFile",
+          version: 6,
+          params: {
+            filename: fileName,
+            data: base64data,
+          },
+        }),
+      });
+  
+      const json = (await response.json()) as AnkiResponse;
+  
+      if (json.error) {
+        return {
+          content: [
+            { type: "text", text: `Failed to upload image: ${json.error}` },
+          ],
+          isError: true,
+        };
+      }
+  
+      return {
+        content: [
+          { type: "text", text: `Image '${fileName}' uploaded successfully.` },
+        ],
+        isError: false,
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `To upload an image to Anki:\n\n1. Place your image file in this folder:\n   \`~/anki-media/\`\n2. Then enter the filename (e.g. \`cat.png\`) when using this tool.\n\nI’ll upload it and make it available in your Anki cards.`,          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
 const server = new Server(
   {
     name: "anki/mcp-server",
@@ -209,7 +281,7 @@ const server = new Server(
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [ADD_NOTE_TOOL, ADD_NOTES_TOOL, CREATE_DECK_TOOL],
+  tools: [ADD_NOTE_TOOL, ADD_NOTES_TOOL, CREATE_DECK_TOOL,UPLOAD_IMAGE_TOOL],
 }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -229,6 +301,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   } else if (request.params.name === "anki_create_deck") {
     const { deckName } = request.params.arguments as { deckName: string };
     return await createDeck(deckName);
+  } else if (request.params.name === "anki_upload_image") {
+    const { fileName } = request.params.arguments as { fileName: string };
+    return await uploadImageFromFolder(fileName);
   }
 
   return {
@@ -244,7 +319,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 async function runServer() {
   const transport = new StdioServerTransport();
+  ensureMediaFolderExists();
   await server.connect(transport);
+  
   console.error("Anki MCP Server running on stdio");
 }
 

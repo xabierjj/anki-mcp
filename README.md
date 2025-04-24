@@ -41,6 +41,20 @@ You should see:
 
 To use this MCP server with **Claude Desktop**, add the following to your `claude_desktop_config.json` file:
 
+### ✅ Local configuration (using `npm` + npm package)
+
+```json
+{
+  "mcpServers": {
+    "anki": {
+      "command": "npx",
+      "args": ["anki-mcp"]
+    }
+  }
+}
+
+```
+
 ### ✅ Local configuration (using `node` + compiled code)
 
 Make sure to run npm run build first to generate the dist/index.js file.

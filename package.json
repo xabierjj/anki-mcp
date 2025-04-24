@@ -1,24 +1,25 @@
 {
   "name": "anki-mcp",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "An MCP server that connects to Anki using AnkiConnect",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc && shx chmod +x dist/*.js",
+    "build": "tsc",
     "prepare": "npm run build",
     "watch": "tsc --watch"
   },
   "bin": {
-  "mcp-server-anki": "./dist/index.js"
-},
+    "mcp-server-anki": "./dist/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xabierjj/anki-mcp.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Xabier Jimenez xabierjj@gmail.com",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/xabierjj/anki-mcp/issues"
   },

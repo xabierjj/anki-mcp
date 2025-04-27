@@ -138,3 +138,35 @@ export async function addNote(deckName: string, front: string, back: string) {
         isError: false,
     };
 }
+
+export async function getDecks() {
+    const response = await fetch("http://127.0.0.1:8765", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "deckNamesAndIds",
+        version: 6,
+      }),
+    });
+  
+    const json = (await response.json()) as AnkiResponse;
+
+  
+    if (json.error) {
+      return {
+        content: [{ type: "text", text: `Failed to get decks: ${json.error}` }],
+        isError: true,
+      };
+    }
+  
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Decks retrieved successfully: ${JSON.stringify(json.result, null, 2)}`,
+        },
+      ],
+      isError: false,
+    };
+  }
+  

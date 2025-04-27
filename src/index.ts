@@ -8,6 +8,8 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { ADD_NOTE_TOOL, ADD_NOTES_TOOL, CREATE_DECK_TOOL } from "./tools/tool-definitions.js";
 import { addNote, addNotes, createDeck } from "./tools/tool-handlers.js";
+import { GET_DECKS_TOOL } from "./tools/tool-definitions.js";
+import { getDecks } from "./tools/tool-handlers.js";
 
 
 const server = new Server(
@@ -23,7 +25,7 @@ const server = new Server(
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [ADD_NOTE_TOOL, ADD_NOTES_TOOL, CREATE_DECK_TOOL],
+  tools: [ADD_NOTE_TOOL, ADD_NOTES_TOOL, CREATE_DECK_TOOL,GET_DECKS_TOOL],
 }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -47,7 +49,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     case "anki_create_deck": {
       const { deckName } = request.params.arguments as { deckName: string };
       return await createDeck(deckName);
+    } 
+    case "anki_get_decks": {
+      return await getDecks();
     }
+    
     default:
       return {
         content: [{ type: "text", text: `Unknown tool: ${request.params.name}` }],

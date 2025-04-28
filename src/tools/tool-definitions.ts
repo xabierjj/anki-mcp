@@ -48,3 +48,13 @@ export const CREATE_DECK_TOOL: Tool = {
     required: ["deckName"],
   },
 };
+
+export const GET_DECKS_TOOL: Tool = {
+  name: "anki_get_decks",
+  description: "Get the names of all decks",
+  inputSchema: {
+    type: "object",
+    properties: {},
+    required: [],
+  },
+};

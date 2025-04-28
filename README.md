@@ -86,6 +86,7 @@ Once added, restart Claude Desktop and you should see your tool available inside
 | `anki_create_deck` | Create a new Anki deck                    |
 | `anki_add_note`    | Add a single flashcard to a deck         |
 | `anki_add_notes`   | Add multiple flashcards at once          |
+| `anki_get_decks`   | List all existing Anki deck names          |
 
 ---
 
